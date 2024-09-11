@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // Docker Hub credentials stored in Jenkins
-        DOCKERHUB_REPO = 'your-dockerhub-username/your-repo-name' // Replace with your Docker Hub repository
+        DOCKERHUB_REPO = 'kingakube/python-web' // Updated with your Docker Hub username and image name
     }
 
     stages {
