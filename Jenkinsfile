@@ -17,8 +17,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image using the Dockerfile
-                    def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
+                    // Build Docker image using the Dockerfile in the python-web directory
+                    def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}", "python-web")
                 }
             }
         }
@@ -29,7 +29,7 @@ pipeline {
                     // Log in to Docker Hub
                     docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS}") {
                         // Push the Docker image to Docker Hub
-                        def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
+                        def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}", "python-web")
                         image.push()
                     }
                 }
