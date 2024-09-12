@@ -20,5 +20,9 @@ pipeline {
                     // Build Docker image using the Dockerfile
                     def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
                 }
-            }
-        }
+            } // Corrected closing brace
+        } // Corrected closing brace for the stage
+        
+        // You may have additional stages here
+    }
+}
