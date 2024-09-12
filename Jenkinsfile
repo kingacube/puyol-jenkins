@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // Docker Hub credentials stored in Jenkins
-        DOCKERHUB_REPO = 'kingakube/python-web' // Updated with your Docker Hub username and image name
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub') // Updated Docker Hub credentials token
+        DOCKERHUB_REPO = 'kingakube/python-web' // Your Docker Hub username and image name
     }
 
     stages {
@@ -20,9 +20,20 @@ pipeline {
                     // Build Docker image using the Dockerfile
                     def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
                 }
-            } // Corrected closing brace
-        } // Corrected closing brace for the stage
-        
-        // You may have additional stages here
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Log in to Docker Hub
+                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS}") {
+                        // Push the Docker image to Docker Hub
+                        def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
+                        image.push()
+                    }
+                }
+            }
+        }
     }
 }
