@@ -20,7 +20,7 @@ pipeline {
                     // Corrected Docker build command
                     // Make sure the path to Dockerfile is correct
                     sh '''
-                    docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} -f python-web-app/Dockerfile python-web-app
+                    docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} -f python-web-app/Dockerfile . 
                     '''
                 }
             }
