@@ -17,8 +17,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image using the Dockerfile in the python-web-app directory
-                    def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}", "python-web-app/Dockerfile")
+                    sh'''
+                    Docker build -t kingacube/python-web -f python-web-app/Dockerfile .
+                    '''
+                   
                 }
             }
         }
