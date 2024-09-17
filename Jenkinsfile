@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // Build Docker image using the Dockerfile in the python-web-app directory
-                    def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}", "python-web-app")
+                    def image = docker.build("${env.DOCKERHUB_REPO}:${env.BUILD_NUMBER}", "python-web-app/Dockerfile")
                 }
             }
         }
