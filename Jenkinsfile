@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         DOCKERHUB_REPO = 'kingakube/python-web'
+        DOCKER_IMAGE_TAG = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -18,10 +19,10 @@ pipeline {
                 stage('Build Docker Image') {
                     steps {
                         script {
-                            def imageTag = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
                             try {
                                 sh """
-                                docker build -t ${imageTag} -f python-web-app/Dockerfile python-web-app
+                                set -x
+                                docker build -t ${DOCKER_IMAGE_TAG} -f python-web-app/Dockerfile python-web-app
                                 """
                             } catch (Exception e) {
                                 error("Docker build failed: ${e.message}")
@@ -33,9 +34,8 @@ pipeline {
                 stage('Push Docker Image') {
                     steps {
                         script {
-                            def imageTag = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
                             docker.withRegistry('https://registry.hub.docker.com', "${DOCKERHUB_CREDENTIALS}") {
-                                def image = docker.image(imageTag)
+                                def image = docker.image("${DOCKER_IMAGE_TAG}")
                                 try {
                                     image.push()
                                 } catch (Exception e) {
