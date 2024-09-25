@@ -18,9 +18,14 @@ pipeline {
                 stage('Build Docker Image') {
                     steps {
                         script {
-                            sh """
-                            docker build -t ${DOCKERHUB_REPO}:${env.BUILD_NUMBER} -f python-web-app/Dockerfile python-web-app
-                            """
+                            def imageTag = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
+                            try {
+                                sh """
+                                docker build -t ${imageTag} -f python-web-app/Dockerfile python-web-app
+                                """
+                            } catch (Exception e) {
+                                error("Docker build failed: ${e.message}")
+                            }
                         }
                     }
                 }
@@ -28,14 +33,28 @@ pipeline {
                 stage('Push Docker Image') {
                     steps {
                         script {
-                            docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS}") {
-                                def image = docker.image("${DOCKERHUB_REPO}:${env.BUILD_NUMBER}")
-                                image.push()
+                            def imageTag = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
+                            docker.withRegistry('https://registry.hub.docker.com', "${DOCKERHUB_CREDENTIALS}") {
+                                def image = docker.image(imageTag)
+                                try {
+                                    image.push()
+                                } catch (Exception e) {
+                                    error("Docker push failed: ${e.message}")
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Build and push succeeded!"
+        }
+        failure {
+            echo "Build or push failed!"
         }
     }
 }
