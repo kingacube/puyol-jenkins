@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub') // DockerHub credentials from Jenkins
+        DOCKERHUB_CREDENTIALS = credentials('kingkube') // DockerHub credentials from Jenkins
         DOCKERHUB_REPO = 'kingakube/python-web'           // Your DockerHub repository
         DOCKER_IMAGE_TAG = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}" // Tag image with build number
     }
