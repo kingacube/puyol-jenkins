@@ -37,10 +37,10 @@ pipeline {
 
         stage('Login to DockerHub') {
             steps {
-                // Securely log into DockerHub using credentials
-                withCredentials([usernamePassword(credentialsId: 'kingakube', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                // Log into DockerHub using credentials securely
+                withCredentials([usernamePassword(credentialsId: 'kingakube', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh """
-                    echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+                    echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
                     """
                 }
             }
