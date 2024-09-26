@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('kingakube')  // Use your DockerHub credentials ID
         DOCKERHUB_REPO = 'kingakube/python-web'           // Your DockerHub repository
         DOCKER_IMAGE_TAG = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}" // Tag image with build number
     }
@@ -38,10 +37,12 @@ pipeline {
 
         stage('Login to DockerHub') {
             steps {
-                // Log into DockerHub using the credentials
-                sh """
-                echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
-                """
+                // Securely log into DockerHub using credentials
+                withCredentials([usernamePassword(credentialsId: 'kingakube', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    sh """
+                    echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+                    """
+                }
             }
         }
 
