@@ -15,9 +15,21 @@ pipeline {
             }
         }
 
+        stage('Check requirements.txt') {
+            steps {
+                // Ensure that requirements.txt is present in the python-web-app directory
+                script {
+                    def requirementsExists = fileExists 'python-web-app/requirements.txt'
+                    if (!requirementsExists) {
+                        error "requirements.txt file not found in python-web-app directory. Please add it before proceeding."
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                // Build Docker image
+                // Build Docker image using the provided Dockerfile
                 sh """
                 docker build -t ${DOCKER_IMAGE_TAG} -f python-web-app/Dockerfile python-web-app
                 """
