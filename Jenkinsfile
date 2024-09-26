@@ -2,59 +2,36 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        DOCKERHUB_REPO = 'kingakube/python-web'
-        DOCKER_IMAGE_TAG = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub') // DockerHub credentials from Jenkins
+        DOCKERHUB_REPO = 'kingakube/python-web'           // Your DockerHub repository
+        DOCKER_IMAGE_TAG = "${DOCKERHUB_REPO}:${env.BUILD_NUMBER}" // Tag image with build number
     }
 
     stages {
         stage('Checkout') {
             steps {
+                // Checkout source code from version control
                 checkout scm
             }
         }
-        
-        stage('Build and Push') {
-            parallel {
-                stage('Build Docker Image') {
-                    steps {
-                        script {
-                            try {
-                                sh """
-                                set -x
-                                docker build -t ${DOCKER_IMAGE_TAG} -f python-web-app/Dockerfile python-web-app
-                                """
-                            } catch (Exception e) {
-                                error("Docker build failed: ${e.message}")
-                            }
-                        }
-                    }
-                }
 
-                stage('Push Docker Image') {
-                    steps {
-                        script {
-                            docker.withRegistry('https://registry.hub.docker.com', "${DOCKERHUB_CREDENTIALS}") {
-                                def image = docker.image("${DOCKER_IMAGE_TAG}")
-                                try {
-                                    image.push()
-                                } catch (Exception e) {
-                                    error("Docker push failed: ${e.message}")
-                                }
-                            }
-                        }
-                    }
-                }
+        stage('Build Docker Image') {
+            steps {
+                // Build Docker image
+                sh """
+                docker build -t ${DOCKER_IMAGE_TAG} -f python-web-app/Dockerfile python-web-app .
+                """
             }
         }
+
     }
 
     post {
         success {
-            echo "Build and push succeeded!"
+            echo 'Docker image built and pushed successfully!'
         }
         failure {
-            echo "Build or push failed!"
+            echo 'Build or push failed!'
         }
     }
 }
