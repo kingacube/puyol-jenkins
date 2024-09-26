@@ -1,27 +1,34 @@
-# Use the official Ubuntu base image
 FROM ubuntu:latest
 
-# Set environment variables to non-interactive to avoid user prompts during package installation
+# Set environment variables to non-interactive to prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update package list and install Python3 and pip
+# Update the package list and install dependencies
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
+    apt-get install -y python3 python3-pip python3-venv build-essential libssl-dev libffi-dev python3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# Copy the application code into the container
 COPY . /app
 
-# Install any needed packages specified in requirements.txt
-RUN pip3 install --no-cache-dir -r requirements.txt
+# Confirm the requirements.txt file is copied and print its contents
+RUN ls -l /app/requirements.txt && cat /app/requirements.txt
 
-# Make port 8000 available to the world outside this container
+# Create a virtual environment and activate it
+RUN python3 -m venv /app/venv
+
+# Install Python dependencies in the virtual environment
+RUN /app/venv/bin/pip install --upgrade pip && \
+    /app/venv/bin/pip install -r /app/requirements.txt
+
+# Expose the port the app runs on
 EXPOSE 8000
 
-# Run manage.py with runserver command when the container launches
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+# Set the entry point to python3 in the virtual environment and command to run the application
+ENTRYPOINT ["/app/venv/bin/python"]
+CMD ["manage.py", "runserver", "0.0.0.0:8000"]
 
