@@ -30,7 +30,7 @@ pipeline {
             steps {
                 // Build Docker image using the provided Dockerfile
                 sh """
-                docker build -t ${DOCKER_IMAGE_TAG} -f python-web-app/Dockerfile python-web-app
+                docker build -t ${DOCKER_IMAGE_TAG} -f python-web-app/Dockerfile .
                 """
             }
         }
